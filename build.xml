@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="jsfilerequest" default="dist" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant"  >
+
+	<tstamp><format property="tstamp" pattern="yyyyMMddHHmm" timezone="GMT"/></tstamp>
+	<property file="default.properties" />
+	
+	<dirname property="base.dir" file="${ant.file.jsfilerequest}" />
+	<property name="lib.dir" value="${base.dir}/static-lib" />	
+	<property name="ivylib.dir" value="${base.dir}/ivy-lib" />	
+	<property name="src.dir" value="${base.dir}/src" />	
+	<property name="build.dir" location="${base.dir}/build" />
+	<property name="classes.dir" location="${build.dir}/classes" />
+	<property name="dist.dir" location="${base.dir}/dist" />
+
+	<path id="lib.path">
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
+		<fileset dir="${ivylib.dir}" includes="**/*.jar"/>
+	</path>
+	
+	<target name="resolve">
+		<mkdir dir="${ivylib.dir}" />
+		<ivy:retrieve pattern="${ivylib.dir}/[artifact].[ext]" sync="true"/>		
+	</target>
+	
+	<target name="compile" depends="resolve">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}"
+        	destdir="${classes.dir}"
+         	debug="on"
+         	source="1.5"
+			encoding="utf8" >
+			<classpath refid="lib.path"/>
+		</javac>
+	</target>
+	
+	<target name="dist" depends="compile">
+		<mkdir dir="${dist.dir}" />
+
+		<jar destfile="${dist.dir}/jsfilerequest.jar">
+			<fileset dir="${classes.dir}"/>
+    		<fileset dir="${src.dir}"/>
+    	</jar>
+	</target>
+	
+	<target name="publish" depends="dist" description="Publish artifacts into Ivy repository">  	
+		<ivy:resolve />
+		<ivy:publish
+			pubrevision="${revision}"
+			resolver="${ivy.publish.ydp.resolver}"
+			status="${ivy.publish.status}"
+			forcedeliver="true"
+			artifactspattern="dist/[artifact].[ext]"
+			overwrite="true"/>		
+	</target>
+		
+	<target name="clean">
+		<delete dir="${dist.dir}" />
+		<delete dir="${build.dir}" />
+		<delete dir="${ivylib.dir}" />
+	</target>
+</project>

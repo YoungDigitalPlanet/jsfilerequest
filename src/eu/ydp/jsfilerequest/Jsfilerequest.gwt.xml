@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='jsfilerequest'>
+  <inherits name='com.google.gwt.user.User'/>
+  <inherits name='com.google.gwt.user.theme.clean.Clean'/>
+
+  <source path='client'/>
+  
+  
+	<replace-with
+		class="eu.ydp.jsfilerequest.client.standard.StandardFileRequest">
+		<when-type-is
+			class="eu.ydp.jsfilerequest.client.FileRequest" />
+	</replace-with>
+	
+	<replace-with
+		class="eu.ydp.jsfilerequest.client.standard.StandardFileRequest">
+		<when-type-is
+			class="eu.ydp.jsfilerequest.client.FileRequest" />
+		<any>
+			<when-property-is name="file.request.performer" value="safari" />
+		</any>
+	</replace-with>
+
+</module>
