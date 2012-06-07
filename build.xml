@@ -5,7 +5,6 @@
 	<property file="default.properties" />
 	
 	<dirname property="base.dir" file="${ant.file.jsfilerequest}" />
-	<property name="lib.dir" value="${base.dir}/static-lib" />	
 	<property name="ivylib.dir" value="${base.dir}/ivy-lib" />	
 	<property name="src.dir" value="${base.dir}/src" />	
 	<property name="build.dir" location="${base.dir}/build" />
@@ -13,7 +12,6 @@
 	<property name="dist.dir" location="${base.dir}/dist" />
 
 	<path id="lib.path">
-		<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		<fileset dir="${ivylib.dir}" includes="**/*.jar"/>
 	</path>
 	
