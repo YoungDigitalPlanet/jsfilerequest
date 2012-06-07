@@ -1,6 +1,6 @@
 package eu.ydp.jsfilerequest.client;
 
-public class FileRequestException extends RuntimeException {
+public class FileRequestException extends Exception {
 	
 	public FileRequestException(Throwable throwable){
 		super(throwable);

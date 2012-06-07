@@ -1,12 +1,10 @@
 package eu.ydp.jsfilerequest.client.jsinject;
 
-import java.util.Queue;
-import java.util.Stack;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import com.google.gwt.core.client.Callback;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.ScriptInjector;
-import com.google.gwt.dom.client.Document;
+import com.google.gwt.core.client.ScriptInjector.FromUrl;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.user.client.Timer;
@@ -14,6 +12,7 @@ import com.google.gwt.user.client.Timer;
 import eu.ydp.jsfilerequest.client.FileRequest;
 import eu.ydp.jsfilerequest.client.FileRequestCallback;
 import eu.ydp.jsfilerequest.client.RequestAction;
+import eu.ydp.jsfilerequest.client.util.SimpleQueue;
 
 /**
  * Class responsible for managing the queue of the files to load,
@@ -22,14 +21,15 @@ import eu.ydp.jsfilerequest.client.RequestAction;
  * @author Rafal Rybacki rrybacki@ydp.com.pl
  *
  */
-class JsInjectRequestPerformer {
+public class JsInjectRequestPerformer {
 
 	private static JsInjectRequestPerformer instance;
 	private int TIMEOUT = 200; // low timeout as the Request Performer will be user only locally
 	private Timer timeoutTimer;
 	
-	Queue<RequestAction> requests = new ArrayBlockingQueue<RequestAction>(0);
-	boolean requestUnderway = false;
+	private SimpleQueue<RequestAction> requests = new SimpleQueue<RequestAction>();
+	private boolean requestUnderway = false;
+	private JavaScriptObject lastScriptElement;
 
 	private JsInjectRequestPerformer(){
 		registerGlobalCallback();
@@ -65,25 +65,33 @@ class JsInjectRequestPerformer {
 	
 	private void sendNextRequest(){
 		if (requests.size() > 0){
-			String url = requests.peek().getRequest().getUrl();
+			String url = requests.peek().getRequest().getUrl() + getFileSuffix();
 			injectScriptNodeIntoDom(url);
 			timeoutTimer.schedule(TIMEOUT);
 		}
 	}
 	
 	private void injectScriptNodeIntoDom(String scriptUrl){
-		ScriptInjector.fromUrl(scriptUrl).setCallback(new Callback<Void, Exception>() {
+		final FromUrl scriptFromUrl = ScriptInjector.fromUrl(scriptUrl).setCallback(new Callback<Void, Exception>() {
 			
 			@Override
-			public void onSuccess(Void result) { }
+			public void onSuccess(Void result) {
+				removeScriptElement(lastScriptElement);
+			}
 			
 			@Override
 			public void onFailure(Exception reason) {
+				removeScriptElement(lastScriptElement);
 				onFileFailure(reason);
 			}
 		});
-		
+		lastScriptElement = scriptFromUrl.inject();
 	}
+	
+	private native void removeScriptElement(JavaScriptObject element)/*-{
+		var parent = element.parentNode;
+    	parent.removeChild(scriptElement);
+	}-*/;
 	
 	private void onTimeout(){
 		onFileFailure(new RequestException("Timeout error loading file: " + requests.peek().getRequest().getUrl()));
@@ -106,9 +114,15 @@ class JsInjectRequestPerformer {
 	
 	private native void registerGlobalCallback()/*-{
 		var instance = this;
-		$wnd.receiveFile = function(text){
+		$wnd.jsFileRequestReceiveFile = function(text){
 			instance.@eu.ydp.jsfilerequest.client.jsinject.JsInjectRequestPerformer::onFileReceive(Ljava/lang/String;)(text);
 		}
+	}-*/;
+	
+	private native String getFileSuffix()/*-{
+		if (typeof $wnd.jsFileRequestSuffix == 'string')
+			return $wnd.jsFileRequestSuffix;
+		return "";
 	}-*/;
 	
 }

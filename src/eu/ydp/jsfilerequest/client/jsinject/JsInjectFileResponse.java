@@ -2,7 +2,7 @@ package eu.ydp.jsfilerequest.client.jsinject;
 
 import eu.ydp.jsfilerequest.client.FileResponse;
 
-class JsInjectFileResponse implements FileResponse {
+public class JsInjectFileResponse implements FileResponse {
 
 	
 	private boolean success;

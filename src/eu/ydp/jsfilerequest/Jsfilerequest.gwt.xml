@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to='jsfilerequest'>
-  <inherits name='com.google.gwt.user.User'/>
-  <inherits name='com.google.gwt.user.theme.clean.Clean'/>
 
-  <source path='client'/>
+	<inherits name='com.google.gwt.user.User'/>
+	<inherits name='com.google.gwt.user.theme.clean.Clean'/>
+
+	<source path='client'/>
   
+	<define-property name="file.request.performer" values="default, jsinject" />
+	
+	<collapse-property name="file.request.performer" values="*" />
   
-	<replace-with
-		class="eu.ydp.jsfilerequest.client.standard.StandardFileRequest">
+	<property-provider name="file.request.performer"><![CDATA[
+		if (window.jsFileRequestPerformer == 'jsinject')
+			return 'jsinject';
+		return 'default';
+	]]>
+	</property-provider>
+  
+	<replace-with class="eu.ydp.jsfilerequest.client.standard.StandardFileRequest">
 		<when-type-is
 			class="eu.ydp.jsfilerequest.client.FileRequest" />
 	</replace-with>
 	
-	<replace-with
-		class="eu.ydp.jsfilerequest.client.standard.StandardFileRequest">
-		<when-type-is
-			class="eu.ydp.jsfilerequest.client.FileRequest" />
+	<replace-with class="eu.ydp.jsfilerequest.client.jsinject.JsInjectFileRequest">
+		<when-type-is class="eu.ydp.jsfilerequest.client.FileRequest" />
 		<any>
-			<when-property-is name="file.request.performer" value="safari" />
+			<when-property-is name="file.request.performer" value="jsinject" />
 		</any>
 	</replace-with>
 
