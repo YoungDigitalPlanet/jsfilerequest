@@ -40,7 +40,15 @@
     	</jar>
 	</target>
 	
-	<target name="publish" depends="dist" description="Publish artifacts into Ivy repository">  	
+	<target name="project.file">
+		<copy file="${base.dir}/project.template.xml" tofile="${base.dir}/project.xml" encoding="UTF-8">
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+	</target>  
+	
+	<target name="publish" depends="dist, project.file" description="Publish artifacts into Ivy repository">  	
 		<ivy:resolve />
 		<ivy:publish
 			pubrevision="${revision}"

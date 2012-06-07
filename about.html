@@ -1,0 +1,53 @@
+<h1>JsFileRequest</h1>
+<p>A GWT library for fetching files that can work in two modes:
+<ul>
+<li>Standard Mode - fetching files via HTTP GET requests</li>
+<li>JavaScript Inject Mode - fetching files via script injection technique; appending &lt;script&gt; tag in &lt;head&gt; with the requested file, the subject file should be prepared
+</ul>
+Usable when the web application is to be run locally (from file:///). IE, Chrome and Opera won't allow XmlHttpRequest for loading local files.
+</p>
+<h2>Preparing content files</h2>
+<p>
+The value of the <code>jsFileRequestSuffix</code> variable should be appended to all file names. Please remember to escape quotation marks and add next line markers.
+</p>
+<p>
+The files should be prepared as shown in the table below:
+</p>
+<table border="1" width="100%">
+<tr><td width="50%">
+Original file contents
+</td><td width="50%">
+Prepared file contents (see underlined fragments)
+</td></tr><tr><td>
+<i>script_00001_001.emp.xml</i>
+</td><td>
+<i>script_00001_001.emp.xml.js</i>
+</td></tr>
+<tr><td>
+<code>
+Lorem 'ipsum' dolor sit amet.<br/>Curabitur viverra dui et tortor volutpat at dignissim metus adipiscing.
+</code>
+</td><td>
+<code>
+<u>window.parent.jsFileRequestReceiveFile(<br/>'</u>Lorem <u>\'</u>ipsum<u>\'</u> dolor sit amet.<u>\n\</u><br/>Curabitur viverra dui et tortor volutpat at dignissim metus adipiscing.<br/><u>');</u>
+</code>
+</td></tr>
+</table>
+<p>
+<b>The references to the files should not change. It means that if <i>script_00001.emt.xml</i> in its contents refers to <i>script_00001_001.emp.xml</i> it must NOT be changed to <i><strike>script_00001_001.emp.xml.js</strike></i>. The JsFileRequest library will add the suffix automatically.</b>
+</p>
+<h2>Typical usage</h2>
+<p>
+Put the below code into your HTML host page:<br/><br/>
+<code>
+	&lt;script type="text/javascript" language="javascript"&gt;<br/>
+	var jsFileRequestSuffix = ".js"; // the suffix added to the names' of all files that will be loaded<br/>
+	var jsFileRequestPerformer = "jsinject"; // "jsinject" or "default" (default value)<br/>
+	var jsFileRequestEnableLogging = true; // set true to enable logging in the console, false or do not define the variable otherwise<br/>
+	&lt;/script&gt;
+</code>
+</p>
+<h2>Future prospect</h2>
+<p>
+Extend the library to work with pure JavaScript.
+</p>

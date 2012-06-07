@@ -1,5 +1,7 @@
 package eu.ydp.jsfilerequest.client.standard;
 
+import static eu.ydp.jsfilerequest.client.util.Logger.log;
+
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -20,11 +22,13 @@ public class StandardFileRequest extends AbstractFileRequest {
 				
 				@Override
 				public void onResponseReceived(Request request, Response response) {
+					log("Standard request response received: " + getUrl());
 					callback.onResponseReceived(instance, new StandardFileResponse(response));
 				}
 				
 				@Override
 				public void onError(Request request, Throwable exception) {
+					log("Standard request response error: " + getUrl());
 					callback.onError(instance, exception);
 				}
 			});

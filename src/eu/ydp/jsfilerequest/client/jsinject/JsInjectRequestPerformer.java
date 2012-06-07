@@ -12,6 +12,7 @@ import com.google.gwt.user.client.Timer;
 import eu.ydp.jsfilerequest.client.FileRequest;
 import eu.ydp.jsfilerequest.client.FileRequestCallback;
 import eu.ydp.jsfilerequest.client.RequestAction;
+import static eu.ydp.jsfilerequest.client.util.Logger.*;
 import eu.ydp.jsfilerequest.client.util.SimpleQueue;
 
 /**
@@ -24,7 +25,7 @@ import eu.ydp.jsfilerequest.client.util.SimpleQueue;
 public class JsInjectRequestPerformer {
 
 	private static JsInjectRequestPerformer instance;
-	private int TIMEOUT = 200; // low timeout as the Request Performer will be user only locally
+	private int TIMEOUT = 1000; // low timeout as the Request Performer will be user only locally
 	private Timer timeoutTimer;
 	
 	private SimpleQueue<RequestAction> requests = new SimpleQueue<RequestAction>();
@@ -56,18 +57,27 @@ public class JsInjectRequestPerformer {
 	 * @param request Request to be queued
 	 * @param callback Callback functions.
 	 */
-	public void queueRequest(FileRequest request, FileRequestCallback callback){
+	public void queueRequest(FileRequest request, FileRequestCallback callback){		
 		requests.offer(new RequestAction(request, callback));
+		log("Adding " + request.getUrl() + " to the queue. The queue contains now " + requests.size() + " elements.");
 		if (!requestUnderway){
 			sendNextRequest();
 		}
 	}
 	
-	private void sendNextRequest(){
+	private synchronized void sendNextRequest(){
+		if (lastScriptElement != null){
+			removeScriptElement(lastScriptElement);
+			lastScriptElement = null;
+		}
 		if (requests.size() > 0){
+			requestUnderway = true;
 			String url = requests.peek().getRequest().getUrl() + getFileSuffix();
+			log("Sending request for url: " + url);
 			injectScriptNodeIntoDom(url);
 			timeoutTimer.schedule(TIMEOUT);
+		} else {
+			requestUnderway = false;
 		}
 	}
 	
@@ -76,12 +86,10 @@ public class JsInjectRequestPerformer {
 			
 			@Override
 			public void onSuccess(Void result) {
-				removeScriptElement(lastScriptElement);
 			}
 			
 			@Override
 			public void onFailure(Exception reason) {
-				removeScriptElement(lastScriptElement);
 				onFileFailure(reason);
 			}
 		});
@@ -90,7 +98,9 @@ public class JsInjectRequestPerformer {
 	
 	private native void removeScriptElement(JavaScriptObject element)/*-{
 		var parent = element.parentNode;
-    	parent.removeChild(scriptElement);
+		if (parent != null)
+			parent.removeChild(element);
+			
 	}-*/;
 	
 	private void onTimeout(){
@@ -100,6 +110,7 @@ public class JsInjectRequestPerformer {
 	private void onFileReceive(String text){
 		timeoutTimer.cancel();
 		RequestAction requestAction = requests.poll();
+		log("File received: " + requestAction.getRequest().getUrl());
 		requestAction.getCallback().onResponseReceived(requestAction.getRequest(), JsInjectFileResponse.createSuccessResponse(text));
 		sendNextRequest();
 	}
@@ -107,6 +118,7 @@ public class JsInjectRequestPerformer {
 	private void onFileFailure(Throwable exception){
 		timeoutTimer.cancel();
 		RequestAction requestAction = requests.poll();
+		log("File receive failed: " + requestAction.getRequest().getUrl());
 		requestAction.getCallback().onError(requestAction.getRequest(), exception);
 		sendNextRequest();
 	}
@@ -115,7 +127,7 @@ public class JsInjectRequestPerformer {
 	private native void registerGlobalCallback()/*-{
 		var instance = this;
 		$wnd.jsFileRequestReceiveFile = function(text){
-			instance.@eu.ydp.jsfilerequest.client.jsinject.JsInjectRequestPerformer::onFileReceive(Ljava/lang/String;)(text);
+			$entry(instance.@eu.ydp.jsfilerequest.client.jsinject.JsInjectRequestPerformer::onFileReceive(Ljava/lang/String;)(text));
 		}
 	}-*/;
 	
@@ -124,5 +136,6 @@ public class JsInjectRequestPerformer {
 			return $wnd.jsFileRequestSuffix;
 		return "";
 	}-*/;
+	
 	
 }

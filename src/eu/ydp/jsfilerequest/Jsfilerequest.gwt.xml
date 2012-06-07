@@ -6,20 +6,20 @@
 
 	<source path='client'/>
   
-	<define-property name="file.request.performer" values="default, jsinject" />
+	<define-property name="file.request.performer" values="default,jsinject" />
 	
 	<collapse-property name="file.request.performer" values="*" />
   
 	<property-provider name="file.request.performer"><![CDATA[
 		if (window.jsFileRequestPerformer == 'jsinject')
 			return 'jsinject';
-		return 'default';
+		else
+			return 'default';
 	]]>
 	</property-provider>
   
 	<replace-with class="eu.ydp.jsfilerequest.client.standard.StandardFileRequest">
-		<when-type-is
-			class="eu.ydp.jsfilerequest.client.FileRequest" />
+		<when-type-is class="eu.ydp.jsfilerequest.client.FileRequest" />
 	</replace-with>
 	
 	<replace-with class="eu.ydp.jsfilerequest.client.jsinject.JsInjectFileRequest">
