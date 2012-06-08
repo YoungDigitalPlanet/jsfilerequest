@@ -5,6 +5,7 @@ import static eu.ydp.jsfilerequest.client.util.Logger.log;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 
 import eu.ydp.jsfilerequest.client.AbstractFileRequest;
@@ -22,8 +23,14 @@ public class StandardFileRequest extends AbstractFileRequest {
 				
 				@Override
 				public void onResponseReceived(Request request, Response response) {
-					log("Standard request response received: " + getUrl());
-					callback.onResponseReceived(instance, new StandardFileResponse(response));
+					if (response.getStatusCode() == Response.SC_OK  ||  response.getStatusCode() == 0){
+						log("Standard request response received: " + getUrl());
+						callback.onResponseReceived(instance, new StandardFileResponse(response));
+					} else {
+						String message = "Standard request response received: " + getUrl() + " but wrong status: " + response.getStatusCode();
+						log(message);
+						callback.onError(instance, new FileRequestException(new RequestException(message)));
+					}
 				}
 				
 				@Override
