@@ -1,18 +1,18 @@
 package eu.ydp.jsfilerequest.client.jsinject;
 
 
+import static eu.ydp.jsfilerequest.client.util.Logger.log;
+
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.core.client.ScriptInjector.FromUrl;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.user.client.Timer;
 
 import eu.ydp.jsfilerequest.client.FileRequest;
 import eu.ydp.jsfilerequest.client.FileRequestCallback;
 import eu.ydp.jsfilerequest.client.RequestAction;
-import static eu.ydp.jsfilerequest.client.util.Logger.*;
 import eu.ydp.jsfilerequest.client.util.SimpleQueue;
 
 /**
@@ -93,8 +93,13 @@ public class JsInjectRequestPerformer {
 				onFileFailure(reason);
 			}
 		});
+		scriptFromUrl.setWindow(getTopWindow());
 		lastScriptElement = scriptFromUrl.inject();
 	}
+	
+	private native JavaScriptObject getTopWindow()/*-{
+		return $wnd;
+	}-*/;
 	
 	private native void removeScriptElement(JavaScriptObject element)/*-{
 		var parent = element.parentNode;
