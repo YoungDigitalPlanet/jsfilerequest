@@ -22,10 +22,10 @@ import eu.ydp.jsfilerequest.client.util.SimpleQueue;
  * @author Rafal Rybacki rrybacki@ydp.com.pl
  *
  */
-public class JsInjectRequestPerformer {
+public final class JsInjectRequestPerformer {
 
 	private static JsInjectRequestPerformer instance;
-	private int TIMEOUT = 1000; // low timeout as the Request Performer will be user only locally
+	private static final int TIMEOUT = 1000; // low timeout as the Request Performer will be user only locally
 	private Timer timeoutTimer;
 	
 	private SimpleQueue<RequestAction> requests = new SimpleQueue<RequestAction>();
