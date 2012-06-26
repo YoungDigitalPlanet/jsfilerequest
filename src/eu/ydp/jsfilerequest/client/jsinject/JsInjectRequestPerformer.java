@@ -29,6 +29,7 @@ public class JsInjectRequestPerformer {
 	private Timer timeoutTimer;
 	
 	private SimpleQueue<RequestAction> requests = new SimpleQueue<RequestAction>();
+	private RequestAction currRequestAction;
 	private boolean requestUnderway = false;
 	private JavaScriptObject lastScriptElement;
 
@@ -72,6 +73,7 @@ public class JsInjectRequestPerformer {
 		}
 		if (requests.size() > 0){
 			requestUnderway = true;
+			currRequestAction = requests.peek();
 			String url = requests.peek().getRequest().getUrl() + getFileSuffix();
 			log("Sending request for url: " + url);
 			injectScriptNodeIntoDom(url);
@@ -109,11 +111,15 @@ public class JsInjectRequestPerformer {
 	}-*/;
 	
 	private void onTimeout(){
-		onFileFailure(new RequestException("Timeout error loading file: " + requests.peek().getRequest().getUrl()));
+		if (currRequestAction != null  &&  currRequestAction == requests.peek()){
+			onFileFailure(new RequestException("Timeout error loading file: " + currRequestAction.getRequest().getUrl()));
+			currRequestAction = null;
+		}
 	}
 	
 	private void onFileReceive(String text){
 		timeoutTimer.cancel();
+		currRequestAction = null;
 		RequestAction requestAction = requests.poll();
 		log("File received: " + requestAction.getRequest().getUrl());
 		requestAction.getCallback().onResponseReceived(requestAction.getRequest(), JsInjectFileResponse.createSuccessResponse(text));
@@ -122,6 +128,7 @@ public class JsInjectRequestPerformer {
 	
 	private void onFileFailure(Throwable exception){
 		timeoutTimer.cancel();
+		currRequestAction = null;
 		RequestAction requestAction = requests.poll();
 		log("File receive failed: " + requestAction.getRequest().getUrl());
 		requestAction.getCallback().onError(requestAction.getRequest(), exception);
