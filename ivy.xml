@@ -9,13 +9,8 @@
   </publications>
 
   <dependencies>
-    <dependency org="com.google.gwt" name="gwt-servlet" rev="2.7.0" conf="default->default"/>  
-    <dependency org="com.google.gwt" name="gwt-user" rev="2.7.0" conf="default->default"/>  
-    <dependency org="com.google.gwt" name="gwt-dev" rev="2.7.0" conf="default->default"/> 
-
-    <!-- Dependencies for some bug in gwt 2.7 dependencies -->
-    <dependency org="org.ow2.asm" name="asm" rev="5.0.3" conf="default->master"/>
-    <dependency org="org.ow2.asm" name="asm-util" rev="5.0.3" conf="default->master"/>
-    <dependency org="org.ow2.asm" name="asm-commons" rev="5.0.3" conf="default->master"/>
+    <dependency org="com.google.gwt" name="gwt-servlet" rev="2.5.0" conf="default->default"/>  
+    <dependency org="com.google.gwt" name="gwt-user" rev="2.5.0" conf="default->default"/>  
+    <dependency org="com.google.gwt" name="gwt-dev" rev="2.5.0" conf="default->default"/> 
   </dependencies>
 </ivy-module>
