@@ -4,3 +4,10 @@ before_install:
   ant init-ivy
 script:
   ant dist
+deploy:
+  provider: releases
+  api_key: "$GIT_HUB"
+  file: "dist/jsfilerequest.jar"
+  skip_cleanup: true
+  on:
+    tags: true
