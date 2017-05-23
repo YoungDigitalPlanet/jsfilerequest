@@ -1,4 +1,6 @@
 jdk:
   - oraclejdk8
+before_install: 
+  ant init-ivy
 script:
   ant dist
