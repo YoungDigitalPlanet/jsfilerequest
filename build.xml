@@ -45,7 +45,7 @@
 		<fileset dir="${ivylib.dir}" includes="**/*.jar"/>
 	</path>
 	
-	<target name="resolve">
+	<target name="resolve" depends="init-ivy">
 		<mkdir dir="${ivylib.dir}" />
 		<ivy:retrieve pattern="${ivylib.dir}/[artifact].[ext]" sync="true"/>		
 	</target>
