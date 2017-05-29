@@ -1,0 +1,67 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.7"
+}
+
+group = 'eu.ydp'
+def projectName = 'jsfilerequest'
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    apply plugin: 'java'
+}
+
+jar {
+    baseName projectName
+    from sourceSets.main.java.srcDirs
+    from sourceSets.main.output
+    duplicatesStrategy 'exclude'
+}
+
+dependencies {
+    compile group: 'com.google.gwt', name: 'gwt-servlet', version: '2.7.0'
+    compile group: 'com.google.gwt', name: 'gwt-user', version: '2.7.0'
+    compile group: 'com.google.gwt', name: 'gwt-dev', version: '2.7.0'
+
+    compile group: 'org.ow2.asm', name: 'asm', version: '5.0.3'
+    compile group: 'org.ow2.asm', name: 'asm-util', version: '5.0.3'
+    compile group: 'org.ow2.asm', name: 'asm-commons', version: '5.0.3'
+}
+
+publishing {
+    publications {
+        BintrayPublication(MavenPublication) {
+            from components.java
+            groupId group
+            artifactId projectName
+            version version
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    publications = ['BintrayPublication']
+    pkg {
+        repo = 'empiria'
+        name = projectName
+        userOrg = 'youngdigitalplanet'
+        licenses = ['EPL-1.0']
+        vcsUrl = 'https://github.com/YoungDigitalPlanet/jsfilerequest.git'
+        publicDownloadNumbers = true
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}

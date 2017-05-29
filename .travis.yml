@@ -1,13 +1,10 @@
 jdk:
-  - oraclejdk8
-before_install: 
-  ant init-ivy
+  - oraclejdk7
 script:
-  ant dist
+  ./gradlew build
 deploy:
-  provider: releases
-  api_key: "$GIT_HUB"
-  file: "dist/jsfilerequest.jar"
+  provider: script
+  script: "./gradlew build bintrayUpload -PbintrayUser=$BINTRAY_USER -PbintrayApiKey=$BINTRAY_API_KEY -Pversion=$TRAVIS_TAG"
   skip_cleanup: true
   on:
     tags: true
